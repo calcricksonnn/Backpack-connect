@@ -35,7 +35,7 @@ export default function Navigation() {
             <Stack.Screen name="Events" component={EventsScreen} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
           </>
-        )}
+        )}.
       </Stack.Navigator>
     </NavigationContainer>
   );
