@@ -1,73 +1,98 @@
-// src/screens/MapScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Button, Alert } from 'react-native';
-import Constants from 'expo-constants';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
+import MapView, { Marker, Polyline, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { auth } from '../firebase';
-import { getActiveTrip, createTrip, listenToTrip, addEntry } from '../utils/tripService';
-import JourneyMap from '../components/JourneyMap';
+
 import EntryUploader from '../components/EntryUploader';
 import TripStats from '../components/TripStats';
 import TripExport from '../components/TripExport';
+import { getActiveTrip, listenToTripEntries } from '../services/tripService';
 
 export default function MapScreen() {
-  const userId = auth.currentUser!.uid;
+  const [region, setRegion] = useState<Region | null>(null);
+  const [markers, setMarkers] = useState<
+    { id: string; latitude: number; longitude: number }[]
+  >([]);
+  const [routeCoords, setRouteCoords] = useState<
+    { latitude: number; longitude: number }[]
+  >([]);
   const [tripId, setTripId] = useState<string | null>(null);
-  const [tripData, setTripData] = useState<any>(null);
 
   useEffect(() => {
     (async () => {
-      // 1. Request location perms
+      // Request location permission
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Location access is required.');
+        Alert.alert(
+          'Permission required',
+          'Location permission is required to record your journey.'
+        );
         return;
       }
 
-      // 2. Get or create active trip
-      let active = await getActiveTrip(userId);
-      if (!active) {
-        active = await createTrip(userId, 'My Journey', new Date());
-      }
-      setTripId(active.id);
+      // Center map on current position
+      const { coords } = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
 
-      // 3. Listen for updates
-      return listenToTrip(active.id, setTripData);
+      // Load or create active trip, then listen for new entries
+      const trip = await getActiveTrip();
+      if (trip) {
+        setTripId(trip.id);
+        listenToTripEntries(trip.id, (entries) => {
+          // Update markers and polyline
+          const m = entries.map((e) => ({
+            id: e.id,
+            latitude: e.location.latitude,
+            longitude: e.location.longitude,
+          }));
+          setMarkers(m);
+          setRouteCoords(
+            m.map((pt) => ({ latitude: pt.latitude, longitude: pt.longitude }))
+          );
+        });
+      }
     })();
   }, []);
 
-  if (!tripData) {
-    return <View style={styles.center}><Button title="Loading trip…" disabled /></View>;
-  }
-
   return (
     <View style={styles.container}>
-      <JourneyMap
-        route={tripData.route}
-        entries={tripData.entries}
-      />
-      <View style={styles.controls}>
-        <EntryUploader
-          tripId={tripId!}
-          onDone={(entry) => addEntry(tripId!, entry)}
-        />
-        <TripStats trip={tripData} />
-        <TripExport trip={tripData} />
-      </View>
+      {region && (
+        <MapView style={styles.map} region={region}>
+          {markers.map((m) => (
+            <Marker
+              key={m.id}
+              coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+            />
+          ))}
+
+          {routeCoords.length > 1 && (
+            <Polyline
+              coordinates={routeCoords}
+              strokeWidth={4}
+              strokeColor="#007AFF"
+            />
+          )}
+        </MapView>
+      )}
+
+      <EntryUploader tripId={tripId} />
+
+      {tripId && (
+        <>
+          <TripStats tripId={tripId} />
+          <TripExport tripId={tripId} />
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  controls: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: '#fffccf',
-    padding: 8,
-    borderTopWidth: 1,
-    borderColor: '#ddd'
-  }
+  map: { flex: 1 },
 });
