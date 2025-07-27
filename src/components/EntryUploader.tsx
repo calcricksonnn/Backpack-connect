@@ -1,67 +1,126 @@
-// src/components/EntryUploader.tsx
 import React, { useState } from 'react';
-import { View, Button, TextInput, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet,
+  Image,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
-import Constants from 'expo-constants';
 
-type Props = {
-  tripId: string;
-  onDone: (entry: any) => void;
-};
+import { addEntry } from '../services/tripService';
 
-export default function EntryUploader({ tripId, onDone }: Props) {
+interface EntryUploaderProps {
+  tripId: string | null;
+}
+
+export default function EntryUploader({ tripId }: EntryUploaderProps) {
   const [note, setNote] = useState('');
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
-  const pickPhoto = async () => {
-    const res = await ImagePicker.launchImageLibraryAsync({
+  const pickFromLibrary = async () => {
+    const { status: libStatus } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: camStatus } =
+      await ImagePicker.requestCameraPermissionsAsync();
+
+    if (libStatus !== 'granted' || camStatus !== 'granted') {
+      Alert.alert(
+        'Permissions required',
+        'Camera and photo library permissions are required.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7
+      quality: 0.7,
     });
-    if (!res.cancelled) setPhoto(res.uri);
+
+    if (!result.cancelled) {
+      setImageUri(result.uri);
+    }
   };
 
-  const submit = async () => {
-    const loc = await Location.getCurrentPositionAsync({});
-    onDone({
-      location: { lat: loc.coords.latitude, lng: loc.coords.longitude },
-      title: note.slice(0, 20) || 'New Entry',
-      note,
-      photos: photo ? [photo] : [],
-      timestamp: new Date()
-    });
-    setNote('');
-    setPhoto(null);
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission required',
+        'Camera permission is required to take photos.'
+      );
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
+    if (!result.cancelled) {
+      setImageUri(result.uri);
+    }
+  };
+
+  const upload = async () => {
+    if (!tripId) {
+      Alert.alert('No active trip', 'Please start a trip first.');
+      return;
+    }
+    try {
+      await addEntry(tripId, { imageUri, note });
+      setImageUri(null);
+      setNote('');
+      Alert.alert('Success', 'Entry added to your trip.');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Upload failed', 'Please try again.');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {photo && <Image source={{ uri: photo }} style={styles.preview} />}
-      <Button title="Pick Photo" onPress={pickPhoto} />
+      <View style={styles.buttonRow}>
+        <Button title="Library" onPress={pickFromLibrary} />
+        <Button title="Camera" onPress={takePhoto} />
+      </View>
+
+      {imageUri && (
+        <Image source={{ uri: imageUri }} style={styles.previewImage} />
+      )}
+
       <TextInput
-        placeholder="Write a note…"
         style={styles.input}
+        placeholder="Add a note"
         value={note}
         onChangeText={setNote}
       />
+
       <Button
-        title="Add Entry"
-        onPress={submit}
-        disabled={!note && !photo}
+        title="Upload"
+        onPress={upload}
+        disabled={!imageUri && note.trim().length === 0}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 8 },
-  preview: { width: 100, height: 100, marginBottom: 8 },
+  container: {
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  previewImage: {
+    width: '100%',
+    height: 180,
+    marginBottom: 12,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 6,
-    marginVertical: 6,
-    borderRadius: 4
-  }
+    padding: 8,
+    marginBottom: 12,
+    borderRadius: 4,
+  },
 });
