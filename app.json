@@ -12,19 +12,30 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "updates": { "fallbackToCacheTimeout": 0 },
-    "assetBundlePatterns": ["**/*"],
+    "updates": {
+      "fallbackToCacheTimeout": 30000,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "assetBundlePatterns": ["assets/**/*"],
     "ios": {
       "bundleIdentifier": "com.yourcompany.backpackconnect",
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Allow location to record your journey",
-        "NSPhotoLibraryUsageDescription": "Allow photo selection for trip entries"
+        "NSCameraUsageDescription": "Allow camera access for trip photos",
+        "NSPhotoLibraryUsageDescription": "Allow photo selection for trip entries",
+        "UIBackgroundModes": ["location"]
       }
     },
     "android": {
       "package": "com.yourcompany.backpackconnect",
-      "permissions": ["ACCESS_FINE_LOCATION", "CAMERA", "READ_EXTERNAL_STORAGE"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES"
+      ]
     },
     "extra": {
       "FIREBASE_API_KEY": "YOUR_API_KEY",
@@ -34,6 +45,20 @@
       "FIREBASE_MESSAGING_SENDER_ID": "YOUR_SENDER_ID",
       "FIREBASE_APP_ID": "YOUR_APP_ID"
     },
-    "plugins": ["expo-build-properties"]
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "13.0"
+          },
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33
+          }
+        }
+      ]
+    ]
   }
 }
+``` [A](https://github.com/cusnirvladislav/ReactNativeWorkshop/tree/b2a33116c77d337b70e60668527116ea514349e4/app.config.js?copilot_analytics_metadata=eyJldmVudEluZm9fbWVzc2FnZUlkIjoiYWtmZkVwcFNaV2VHUkx4ZWlFcDVhIiwiZXZlbnRJbmZvX2NsaWNrU291cmNlIjoiY2l0YXRpb25MaW5rIiwiZXZlbnRJbmZvX2NvbnZlcnNhdGlvbklkIjoiYVdtcGQyS3l4N1QzNUc1cXhRYVY1IiwiZXZlbnRJbmZvX2NsaWNrRGVzdGluYXRpb24iOiJodHRwczpcL1wvZ2l0aHViLmNvbVwvY3VzbmlydmxhZGlzbGF2XC9SZWFjdE5hdGl2ZVdvcmtzaG9wXC90cmVlXC9iMmEzMzExNmM3N2QzMzdiNzBlNjA2Njg1MjcxMTZlYTUxNDM0OWU0XC9hcHAuY29uZmlnLmpzIn0%3D&citationMarker=9F742443-6C92-4C44-BF58-8F5A7C53B6F1)
