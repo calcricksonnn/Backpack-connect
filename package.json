@@ -25,6 +25,7 @@
     "expo-location": "~15.0.1",
     "expo-image-picker": "~14.1.1",
     "expo-sharing": "~10.1.1"
+    "metro": "0.73.10"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
