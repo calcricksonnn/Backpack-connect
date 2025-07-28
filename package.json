@@ -15,7 +15,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "expo": "~48.0.0",
+    "expo": "~50.0.0",
     "expo-status-bar": "~1.4.0",
     "firebase": "^9.11.0",
     "react": "18.2.0",
