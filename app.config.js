@@ -1,10 +1,12 @@
+require('dotenv/config');
+
 module.exports = () => ({
   name: "Backpack Connect",
   slug: "backpack-connect",
   version: "1.0.0",
   sdkVersion: "50.0.0",
-  orientation: "portrait",
   platforms: ["ios", "android"],
+  orientation: "portrait",
   icon: "./assets/icon.png",
   splash: {
     image: "./assets/splash.png",
