@@ -1,15 +1,14 @@
-// tsconfig.json
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"]
+    },
     "jsx": "react-native",
+    "allowJs": true,
+    "skipLibCheck": true,
     "strict": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
+    "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "app.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
 }
