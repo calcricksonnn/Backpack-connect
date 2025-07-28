@@ -34,5 +34,8 @@ module.exports = () => ({
       googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY
     }
   },
-  plugins: ["expo-updates"]
+  plugins: [
+    "expo-updates",
+    "expo-build-properties"
+  ]
 });
