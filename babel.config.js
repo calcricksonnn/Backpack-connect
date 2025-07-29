@@ -1,21 +1,18 @@
+// babel.config.js
+
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      'babel-preset-expo'
+    ],
     plugins: [
-      'expo-router/babel',
       [
         'module-resolver',
         {
           alias: {
-            '@src': './src',
-            '@components': './src/components',
-            '@utils': './src/utils',
-            '@screens': './src/screens'
+            '@src': './src'
           },
-          extensions: ['.js', '.jsx', '.ts', '.tsx']
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
         }
-      ]
-    ]
-  };
-};
+      ],
