@@ -1,3 +1,8 @@
 const { getDefaultConfig } = require('expo/metro-config');
 
-module.exports = getDefaultConfig(__dirname);
+const defaultConfig = getDefaultConfig(__dirname);
+
+// Ensure TypeScript files are resolvable
+defaultConfig.resolver.sourceExts.push('ts', 'tsx');
+
+module.exports = defaultConfig;
