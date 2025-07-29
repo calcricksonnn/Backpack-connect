@@ -8,8 +8,12 @@ module.exports = function (api) {
         'module-resolver',
         {
           alias: {
-            '@src': './src'
-          }
+            '@src': './src',
+            '@components': './src/components',
+            '@utils': './src/utils',
+            '@screens': './src/screens'
+          },
+          extensions: ['.js', '.jsx', '.ts', '.tsx']
         }
       ]
     ]
