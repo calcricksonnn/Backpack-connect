@@ -1,60 +1,59 @@
-require("dotenv/config");
+// app.config.js
 
-if (
-  !process.env.API_URL ||
-  !process.env.FIREBASE_API_KEY ||
-  !process.env.ANDROID_GOOGLE_MAPS_API_KEY ||
-  !process.env.IOS_GOOGLE_MAPS_API_KEY
-) {
-  throw new Error("Missing one or more required .env variables");
-}
+// 1. Preload .env into process.env
+require('dotenv/config');
 
-module.exports = () => ({
-  name: "Backpack Connect",
-  slug: "backpack-connect",
-  version: "1.0.0",
-  sdkVersion: "53.0.0",
-  platforms: ["ios", "android"],
-  orientation: "portrait",
-  icon: "./assets/icon.png",
-  splash: {
-    image: "./assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#ffffff"
-  },
-  updates: {
-    fallbackToCacheTimeout: 0
-  },
-  assetBundlePatterns: ["**/*"],
-  runtimeVersion: "1.0.0",
-  owner: "calcrickson", // replace with your Expo username if publishing
-  extra: {
-    API_URL: process.env.API_URL,
-    FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
-    ENV: process.env.NODE_ENV || "development"
-  },
-  android: {
-    config: {
-      googleMaps: {
-        apiKey: process.env.ANDROID_GOOGLE_MAPS_API_KEY
-      }
+module.exports = {
+  expo: {
+    name: process.env.APP_NAME || "Backpack Connect",
+    slug: process.env.APP_SLUG || "backpack-connect",
+    version: process.env.APP_VERSION || "1.0.0",
+    orientation: "portrait",
+    scheme: process.env.EXPO_SCHEME || "backpackconnect",
+    platforms: ["ios", "android", "web"],
+
+    icon: "./assets/icon.png",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
+    },
+
+    updates: {
+      fallbackToCacheTimeout: 0,
+      url: process.env.EAS_UPDATE_URL
+    },
+
+    assetBundlePatterns: ["**/*"],
+
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: process.env.IOS_BUNDLE_IDENTIFIER
+    },
+
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#ffffff"
+      },
+      package: process.env.ANDROID_PACKAGE
+    },
+
+    web: {
+      favicon: "./assets/favicon.png"
+    },
+
+    extra: {
+      // Firebase config
+      firebaseApiKey: process.env.FIREBASE_API_KEY,
+      firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
+      firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      firebaseAppId: process.env.FIREBASE_APP_ID,
+
+      // EAS
+      easProjectId: process.env.EAS_PROJECT_ID
     }
-  },
-  ios: {
-    config: {
-      googleMapsApiKey: process.env.IOS_GOOGLE_MAPS_API_KEY
-    }
-  },
-  plugins: [
-    "expo-updates",
-    "expo-build-properties",
-    [
-      "expo-constants",
-      {
-        extra: {
-          ENV: process.env.NODE_ENV || "development"
-        }
-      }
-    ]
-  ]
-});
+  }
+};
