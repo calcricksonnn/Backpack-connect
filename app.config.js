@@ -12,34 +12,38 @@ module.exports = {
     scheme: process.env.EXPO_SCHEME || "backpackconnect",
     platforms: ["ios", "android", "web"],
 
-    icon: "./assets/icon.png",
-    splash: {
-      image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff"
-    },
+    // 👇 Temporarily disable broken asset references
+    // Remove or uncomment once you've added these files
+    // icon: "./assets/icon.png",
+    // splash: {
+    //   image: "./assets/splash.png",
+    //   resizeMode: "contain",
+    //   backgroundColor: "#ffffff"
+    // },
 
     updates: {
       fallbackToCacheTimeout: 0,
-      url: process.env.EAS_UPDATE_URL
+      url: process.env.EAS_UPDATE_URL || undefined
     },
 
     assetBundlePatterns: ["**/*"],
 
     ios: {
       supportsTablet: true,
-      bundleIdentifier: process.env.IOS_BUNDLE_IDENTIFIER
+      bundleIdentifier: process.env.IOS_BUNDLE_IDENTIFIER || undefined
     },
 
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
+        // Commented out since image not yet added
+        // foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      package: process.env.ANDROID_PACKAGE
+      package: process.env.ANDROID_PACKAGE || undefined
     },
 
     web: {
+      // Fallback to blank if favicon isn't present
       favicon: "./assets/favicon.png"
     },
 
